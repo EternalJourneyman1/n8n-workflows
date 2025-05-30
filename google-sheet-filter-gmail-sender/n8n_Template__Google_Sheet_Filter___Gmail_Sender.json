@@ -1,0 +1,170 @@
+{
+  "name": "n8n Template: Google Sheet Filter & Gmail Sender",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 1. TRIGGER: New Google Sheet Row\n\nINFO: This node automatically starts the workflow when a new row is added to a Google Sheet you specify. It checks for new rows based on the 'Poll Times' setting (default in template: 'Every Minute').\n\n➡️ YOUR SETUP (MANDATORY):\n\n    CREDENTIAL: In 'Credential to connect with', select or create YOUR Google Sheets credential.\n    DOCUMENT: Click the selector for 'Document' and choose YOUR Google Spreadsheet.\n    SHEET: Select YOUR specific sheet name from the chosen Document.\n\n➡️ OPTIONAL ADJUSTMENTS:\n\n    Poll Times: Change how often it checks (e.g., 'Every 5 Minutes', 'Hourly', via CRON).\n    Trigger On: While 'Row Added' is common, you can change to 'Row Updated' or 'Row Added or Updated' if needed.\n\nOUTPUT: Each new row detected becomes an individual item sent to Node 2.",
+        "height": 940,
+        "width": 340
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -320,
+        -1440
+      ],
+      "typeVersion": 1,
+      "id": "6817e4f1-1302-4949-8d6a-854618338a27",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## 2. CODE: Filter for Items with No 'Student ID'\n\nINFO: This Code node uses JavaScript to filter incoming items.\n\n    Current JS Logic: return $input.all().filter(row => !row.json['Student ID']);\n        This keeps only items where the 'Student ID' field is empty/missing.\n    Output: Each matching item (row) is output individually.\n\n➡️ YOUR ACTION (To Adapt This Filter):\n\n    Edit JavaScript Code:\n        Change 'Student ID' to YOUR relevant field name if different.\n        Modify the filter condition !row.json['Student ID'] if your criteria for keeping/discarding items change.\n        (Basic JavaScript understanding is helpful).\n    ALTERNATIVE (No-Code): For simple filtering like this, you could replace this Code node with a standard n8n 'IF' node or 'Filter' node.\n\nOUTPUT: Individual items that match the filter criteria are passed directly to the next node (e.g., Node 4 for emailing).\"",
+        "height": 960,
+        "width": 300
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        80,
+        -1440
+      ],
+      "typeVersion": 1,
+      "id": "44f00386-89e5-40e1-a204-87f87a9e62cc",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// const emptyStudentIDs = [];\n// let lastStudentID = null;\n\nreturn $input.all().filter((row) => !row.json['Student ID'])\n// for (const item of $input.all()) {\n//   if (!item.json['Student ID']) {  \n//     emptyStudentIDs.push(item);  // Store empty Student ID rows\n//   } else {\n//     lastStudentID = item.json['Student ID'];  // Update last valid Student ID\n//   }\n// }\n\n// // Return both values in a structured way\n// return [{ json: { lastStudentID, emptyStudentIDs } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        180,
+        -680
+      ],
+      "id": "9737742a-41ca-4fa9-b01f-fcc35b44318c",
+      "name": "Grab Students with no studentID",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1ra5XaSUG5_EMCIlUbyzozwyjuKfqRyO9reyR3lBWhuE",
+          "mode": "list",
+          "cachedResultName": " InnerCode x Google Career Certificates (Responses)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ra5XaSUG5_EMCIlUbyzozwyjuKfqRyO9reyR3lBWhuE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1892977178,
+          "mode": "list",
+          "cachedResultName": "Responses",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ra5XaSUG5_EMCIlUbyzozwyjuKfqRyO9reyR3lBWhuE/edit#gid=1892977178"
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -200,
+        -680
+      ],
+      "id": "9f528ce9-521d-433b-9d11-3b1ae24a0db6",
+      "name": "Grab All Rows in Excel Sheet",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "AXgcmoNo3eYiImRa",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 3. ACTION: Send Email (Gmail)\n\nINFO: Sends an email for each item received from Node 2.\n\n➡️ YOUR SETUP (MANDATORY):\n\n    CREDENTIAL: In 'Credential to connect with', select or create YOUR Gmail account credential.\n    TO ADDRESS:\n        The 'To' field likely has an expression like: {{ $json['Email Address'] }}.\n        VERIFY/CHANGE: Ensure Email Address matches the EXACT column name from YOUR data that holds the recipient's email.\n    EMAIL CONTENT:\n        Customize the Subject (usually a field above 'To Address', not fully visible in screenshot but standard).\n        Edit the HTML Message body to create your email content. You can use {{ $json.YourFieldName }} to insert other data from your items.\n\nOUTPUT: This node typically doesn't output items to the next node unless specifically configured to do so (e.g., for error handling, which is not shown here).\"",
+        "height": 960,
+        "width": 320
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        480,
+        -1440
+      ],
+      "typeVersion": 1,
+      "id": "959f2221-e48f-4fab-9ddb-524c01e3658a",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json['Email Address'] }}",
+        "subject": "=Welcome  {{ $json['Full Name'] }}",
+        "message": "=<!DOCTYPE html>\n<html>\n<head>\n    <style>\n        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }\n        .header { background-color: #4CAF50; /* Generic Green - or choose your preferred generic color */ color: white; padding: 15px; border-radius: 5px; margin-bottom: 20px; text-align: center; }\n        .info-section { background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 15px; }\n        .item-details { margin-bottom: 20px; }\n        .next-steps { background-color: #e7f3ff; padding: 15px; border-radius: 5px; }\n        .field { margin-bottom: 8px; }\n        .label { font-weight: bold; color: #333; } /* Darker label for better contrast */\n        ol { margin-left: 20px; }\n        li { margin-bottom: 5px; }\n    </style>\n</head>\n<body>\n    <div class=\"header\">\n        <h2>Item Processed Notification</h2>\n        <p>[Optional: Your Workflow or Company Name Here]</p>\n    </div>\n\n    <div class=\"info-section\">\n        <h3>Item Details</h3>\n        <p><em>To customize: Edit labels and use <code>{{ $json['Your Exact Column Name From Sheet'] }}</code> to insert data. Add/remove 'div class=\"field\"' lines as needed.</em></p>\n        <div class=\"item-details\">\n            <div class=\"field\"><span class=\"label\">[Identifier Field Label]:</span> {{ $json['[Your Main Identifier Column Name]'] }}</div>\n            <div class=\"field\"><span class=\"label\">[Relevant Data Field 1 Label]:</span> {{ $json['[Your Column Name for Data 1]'] }}</div>\n            <div class=\"field\"><span class=\"label\">[Relevant Data Field 2 Label]:</span> {{ $json['[Your Column Name for Data 2]'] }}</div>\n            <div class=\"field\"><span class=\"label\">[Date/Timestamp Label]:</span> {{ $json['[Your Column Name for Date/Timestamp]'] }}</div>\n            </div>\n    </div>\n\n    <div class=\"next-steps\">\n        <h3>Action Required / Next Steps (Customize for your process)</h3>\n        <ol>\n            <li>[Your Action Step 1 - e.g., Review item details]</li>\n            <li>[Your Action Step 2 - e.g., Update status in another system]</li>\n            <li>[Your Action Step 3 - e.g., Follow up if needed]</li>\n            </ol>\n    </div>\n</body>\n</html>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        600,
+        -680
+      ],
+      "id": "1dfe6837-9869-427d-b5a1-123ee4366837",
+      "name": "Send Email to Recipient (from Row)",
+      "webhookId": "87f39a02-e000-4ae3-8016-c78e16ee9610",
+      "alwaysOutputData": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "dGsADR5HSkw0mLEV",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Grab Students with no studentID": {
+      "main": [
+        [
+          {
+            "node": "Send Email to Recipient (from Row)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Grab All Rows in Excel Sheet": {
+      "main": [
+        [
+          {
+            "node": "Grab Students with no studentID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email to Recipient (from Row)": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f03051f8-031a-4502-9f10-135eea47b409",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7168fb9578dead54be3b29a8e385b74a2d0abfc28c57e8b7b5b43f7aeb835881"
+  },
+  "id": "DYgzvVtgZ9IH9xQ4",
+  "tags": []
+}

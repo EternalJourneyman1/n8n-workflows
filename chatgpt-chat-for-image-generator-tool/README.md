@@ -1,0 +1,1 @@
+For this to work please update the api key bearer token found in the ChatGPT4o_Chat_For_Image_Generator_Tool UI after importing this files
