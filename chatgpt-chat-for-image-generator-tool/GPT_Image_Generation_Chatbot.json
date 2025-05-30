@@ -1,0 +1,128 @@
+{
+  "name": "GPT Image Generation Chatbot",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## **1. CHAT INPUT (User Prompt)**\n\n**INFO:** This node starts the workflow when you send a message in the n8n Chat interface linked to this workflow.\n* The text you type is captured as the user's prompt.\n\n➡️ **YOUR ACTION:**\n* No specific configuration is typically needed in *this node* for the template to function.\n* To use: Open the chat for this workflow and type your image description.\n\n**OUTPUT:** The chat message (containing your prompt text and other details) is passed to Node 2.\n",
+        "height": 540,
+        "width": 360
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1960,
+        -1220
+      ],
+      "typeVersion": 1,
+      "id": "2bf9d692-b484-4da7-ab49-81b08bd54ff3",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "public": true,
+        "options": {
+          "allowFileUploads": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1860,
+        -840
+      ],
+      "id": "b01ced73-b599-472d-9922-9d54a83a8350",
+      "name": "Chat Input: User Prompt",
+      "webhookId": "0e6853ae-8c4b-4273-ad6c-1e304e119921"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "0tjASGeLiKjphA1W",
+          "mode": "list",
+          "cachedResultName": "n8n template: GPT Image API Tool"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "query": "{{ $json.chatInput }}"
+          },
+          "matchingColumns": [
+            "query"
+          ],
+          "schema": [
+            {
+              "id": "query",
+              "displayName": "query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "image",
+              "displayName": "image",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "object",
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        -1300,
+        -820
+      ],
+      "id": "d39ea75b-472b-424b-925d-ddb344b26678",
+      "name": "Call ChatGPT 4o Image Generator Tool Workflow",
+      "executeOnce": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "content": "## **2. ACTION: Generate Image (via GPT-4o Tool/Agent)**\n\n**INFO:** This node takes the user's chat prompt (from Node 1) and sends it to a specialized tool or sub-workflow responsible for generating an image using a GPT-4o model.\n\n➡️ **YOUR SETUP (CRITICAL):**\n1.  **SELECT/VERIFY TOOL:**\n    * Ensure the 'Workflow' or 'Tool' selected (e.g., \"Workflow: GptModelAgentW...\") correctly points to your **pre-configured image generation agent or sub-workflow.**\n    * **This external tool/agent MUST be set up and working independently in your n8n instance.**\n2.  **CONFIGURE UNDERLYING TOOL:**\n    * The selected image generation tool/agent requires its own setup, including **OpenAI API credentials** with GPT-4o (and DALL-E/image generation) access. This is configured *within that tool/agent*, not directly here.\n3.  **INPUT MAPPING:**\n    * Check this node's 'Parameters' or 'Input' section.\n    * Confirm that the user's chat message text (e.g., `{{ $json.chatInput }}` or `{{ $json.chatInput }}` from Node 1) is correctly mapped as the 'prompt' (or similar input field) for the image generation tool.\n\n**OUTPUT:** This node should return the generated image (e.g., as a URL or file data) or a response message, which will then be displayed back in the chat.",
+        "height": 640,
+        "width": 620
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1520,
+        -1340
+      ],
+      "typeVersion": 1,
+      "id": "abf04a66-1204-41f9-a776-d48be77b7b1c",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Chat Input: User Prompt": {
+      "main": [
+        [
+          {
+            "node": "Call ChatGPT 4o Image Generator Tool Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "c1338295-b416-435a-af6b-84c0a11fbf53",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7168fb9578dead54be3b29a8e385b74a2d0abfc28c57e8b7b5b43f7aeb835881"
+  },
+  "id": "FTgpPky565DZo7Nf",
+  "tags": []
+}
